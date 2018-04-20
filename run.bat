@@ -1,0 +1,1 @@
+"%FijiPath%\ImageJ-win64.exe" -run "Dmel VLs"
