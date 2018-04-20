@@ -1,6 +1,7 @@
 import ij.plugin.PlugIn;
 import ij.*;
 import ij.io.*;
+import ij.IJ.*;
 
 import java.util.*;
 import java.io.File;
@@ -10,77 +11,28 @@ import vlms.utilities.*;
 
 
 public class Dmel_VLs implements PlugIn{
-	public static int inst_count = 0;
-		
-	public Dmel_VLs() {
-		inst_count++;
-	}
-	
 	public void run(String arg) {
-		String py_path = "C:\\Users\\localuser\\Desktop\\Code Laboratory\\vlms\\py_testing.py";
+		String py_path = "D:\\People Files\\Lab\\Fiji\\Jython\\Dmel_VLs.py";
 		
-		if(inst_count == 1) {
-			Opener myOpener = new Opener();
-			myOpener.open(py_path);	
-		}
+		//if(inst_count == 1) {
+		Opener myOpener = new Opener();
+		myOpener.open(py_path);	
 		
-		String pathStr;
-			String[] experPaths = {
-				"C:\\Users\\localuser\\Desktop\\Code Laboratory\\Steffi\\Steffi NMJ datasets\\150729_w1118",
-				"C:\\Users\\localuser\\Desktop\\Code Laboratory\\Steffi\\Steffi NMJ datasets\\150910_Dm2-EGFP",
-				"C:\\Users\\localuser\\Desktop\\Code Laboratory\\Steffi\\Steffi NMJ datasets\\151021_Dm2-GFPRNAi",
-				"C:\\Users\\localuser\\Desktop\\Code Laboratory\\Steffi\\Steffi NMJ datasets\\151216_Dm2-GFP",
-				
-				"C:\\Amelia\\Lab\\Mridula\\day6"
-			};
-
-		//int[] whichOnes = {0,1,2,3};
-		int[] whichOnes = {4};
 		
-		boolean nuc = false;
-		boolean cell = false;
-		boolean mridula = true;
 		
-		for (int i = 0; i < whichOnes.length; i++) {
-			File path = new File(experPaths[whichOnes[i]]);
-			
-			if (nuc) {
-				String nucFileSuf = "y-area-thickness";
-			
-				String[] nucHeadings = {"Y","Y Scaled to Cell","Area","Thickness(minFeret)","Thickness(Height)", "vol pix count", "vol pix sum","Cross-sectional Area","orth vol sum","stack vol sum","cropped stack vol sum","cropped stack vol sum2"};
-			
-				Experiment e = Experiment.experConstructEverything(path, nucFileSuf, nucHeadings);
-			}
-			
-			if (cell) {
-				String cellFileSuf = "cell-vol-stuff";
-				// String[] cellHeadings = {"Area","Nuc Total Area","Volume", "Volume 2","Nuc Total Volume","thickness mean"};
-				String[] cellHeadings = {"Area","Volume 0", "Volume 1", "Volume 2","thickness mean 0", "thickness mean 1","Nuc Total Area","Nuc Total Volume"};
-				
-				Experiment e = new Experiment(path);
-				e.testOneCell();
-				//e.forEachCell();
-				//e.exportCellData(cellFileSuf,cellHeadings);
-			}
-			
-			if (mridula) {
-				String cellFileSuf = "erm";
-				String[] mridulaHeadings = {};
-				Experiment e = new Experiment(path,1);
-				//e.exportCellData(cellFileSuf, mridulaHeadings);
-				e.mridulaForEachCell();
-				e.mridulaDataCsv();
-			}
-			
-			// //if (whichOnes.length > 2) {
-				// e.close();
-				// e = null;
-				// System.gc();
-			// }
-		}
+		
+		String py_path2 = IJ.getDirectory("startup") + "\\jars\\Lib\\Dmel_VLs.py";
+		
+		//if(inst_count == 1) {
+		Opener myOpener2 = new Opener();
+		myOpener.open(py_path2);	
+		
+		
+		
+		//}
+		
+		
 	}
 	
-	public void close() {
-		inst_count--;
-	}
+	
 }

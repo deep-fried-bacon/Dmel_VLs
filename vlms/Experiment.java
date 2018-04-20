@@ -50,26 +50,16 @@ public class Experiment {
 
 		loadChannels(); // sets channels 
 
-		//createHemisegs(); // sets hemisegs
+		createHemisegs(); // sets hemisegs
 		
-		//createIterables();
+		createIterables();
 	}
 	
-	public Experiment(File path, int a) {
-		insts.add(this);
-		this.path = path;
-		//experView = new ExperimentView(this);
-		
-		//parseName(); // sets name, data, genotype
-		name = path.getName();
-		loadChannels(); // sets channels 
-
-		mridulaCreateHemisegs(); // sets hemiseg
-		
-		mridulaCreateIterables();
-		
-		
+	public Experiment(String stringPath) {
+		this(new File(stringPath));
 	}
+	
+
 	
 	public void createIterables() {
 		cells = new ArrayList<Cell>();
@@ -85,15 +75,6 @@ public class Experiment {
 		}
 	}	
 	
-	public void mridulaCreateIterables() {
-		cells = new ArrayList<Cell>();
-		for (Hemisegment hemiseg : hemisegs) {
-			for (Cell c : hemiseg.cells) {
-				cells.add(c);
-			}
-			
-		}
-	}	
 	
 	public void close() {
 		insts.remove(insts.indexOf(this));
@@ -178,93 +159,7 @@ public class Experiment {
 		}
 	}
 	
-	public void mridulaCreateHemisegs() {
-		hemisegFileList = new ArrayList<File>();
-		hemisegs = new ArrayList<Hemisegment>();
-		File[] subDirs = path.listFiles();
-		
-		for(int i = 0; i < subDirs.length; i++) {
-			if (subDirs[i].getName().startsWith(name) && subDirs[i].isDirectory()) {
-				hemisegFileList.add(subDirs[i]);
-				hemisegs.add(new Hemisegment(this, subDirs[i], 1));
-			}	
-		}
-	}
 	
-	
-	public void mridulaForEachCell() {
-		for (Cell c : cells) {
-			c.mridulaDo();
-		}
-	}
-	
-	public void mridulaDataCsv() {
-		File outCsv = new File(path, name + "_" + "erm" + ".csv");
-		BufferedWriter writer = null;
-		
-		try {
-			writer = new BufferedWriter(new FileWriter(outCsv));
-			String temp = "";
-			for (Cell c : cells) {
-				temp = c.cellID();
-				for (double val : c.data2.get("xCol")) {
-					temp += "," + val;
-				}
-				writer.write(temp + "\n");
-				
-				temp = "Channel 1";
-				for (double val : c.data2.get("Channel 1")) {
-					temp += "," + val;
-				}
-				writer.write(temp + "\n");
-				
-				temp = "Channel 2";
-				for (double val : c.data2.get("Channel 2")) {
-					temp += "," + val;
-				}
-				writer.write(temp + "\n");
-			}
-				
-				
-			//String labels = "Hemisegment,Cell,";
-			
-			// for (int i = 0; i < headings.length; i++) {
-				// labels += (headings[i] + ",");
-			// }
-			
-			// writer.write(labels+"\n");
-			
-			// for (Cell c : cells) {
-				// String temp = c.hemiseg.name + ",vl"+c.vlNum + ",";
-				// for (int i = 0; i < headings.length; i++) {
-					// String heading2 = headingRename(headings[i]);
-					// if (c.data.containsKey(heading2)) {
-						// MutableDouble val = c.data.get(heading2);
-						// if (val != null) {
-							// temp += (c.data.get(heading2));
-						// }
-					// }
-					// temp += ",";
-				// }
-				// writer.write(temp + "\n");
-					
-			// }
-			writer.close();
-			// return true;
-		}
-		catch (FileNotFoundException e) {
-			/** deal with exception appropriately **/
-			IJ.log("FileNotFoundException in Experiment.exportCellData");
-			return;
-		}
-		catch (IOException e) {
-			/** deal with exception appropriately **/
-			IJ.log("IOException in Experiment.exportCellData");
-			return;
-		}
-
-	}
-		
 	
 	
 	

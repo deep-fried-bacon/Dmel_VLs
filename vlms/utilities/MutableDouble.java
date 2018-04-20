@@ -1,6 +1,5 @@
 package vlms.utilities;
 
-
 public class MutableDouble {
 	private double value;
 
@@ -12,7 +11,6 @@ public class MutableDouble {
 		this.value = value;
 	}
 	
-	
 	public double get() {
 		return value;
 	}
@@ -21,9 +19,7 @@ public class MutableDouble {
 		value = i;
 	}
 
-	
 	public String toString() {
 		return (String.valueOf(value));
 	}
-	
 }
