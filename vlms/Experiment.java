@@ -4,7 +4,8 @@ import ij.io.*;
 
 import java.util.*;
 import java.io.*;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
 
@@ -13,6 +14,7 @@ import vlms.utilities.*;
 
 public class Experiment {
 	public static ArrayList<Experiment> insts = new ArrayList<Experiment>();
+	public static boolean makeLogs = true;
 	
 	public File path;
 	
@@ -28,8 +30,13 @@ public class Experiment {
 	public ArrayList<Hemisegment> hemisegs;
 	
 	
+	
 	public ArrayList<Cell> cells;
 	public ArrayList<Nucleus> nucs;
+	
+	public Hashtable<String, methodCalcDoc> cellMethodLogLookup  = new Hashtable<String, methodCalcDoc>();
+	public Hashtable<String, methodCalcDoc> nucMethodLogLookup  = new Hashtable<String, methodCalcDoc>();
+	
 	
 	
 	public static Experiment experConstructEverything(File path, String outFileSuf, String[] headings) {
@@ -167,6 +174,8 @@ public class Experiment {
 	
 	
 	public boolean exportCellData(String fileSuf, String[] headings) {
+		if (makeLogs) exportDataLog(fileSuf, "Cell");
+
 		File outCsv = new File(path, name + "_" + fileSuf + ".csv");
 		BufferedWriter writer = null;
 		
@@ -212,6 +221,8 @@ public class Experiment {
 	}
 		
 	public boolean exportNucData(String fileSuf, String[] headings) {
+		if (makeLogs) exportDataLog(fileSuf, "Nuc");
+		
 		File outCsv = new File(path, name + "_" + fileSuf + ".csv");
 		BufferedWriter writer = null;
 		
@@ -253,6 +264,37 @@ public class Experiment {
 		catch (IOException e) {
 			/** deal with exception appropriately **/
 			IJ.log("IOException in Experiment.exportNucData");
+			return false;
+		}
+	}
+	
+	public boolean exportDataLog(String fileSuf, String nucOrCell) {
+		File logPath = new File(path, name + "_" + fileSuf + ".log");
+		BufferedWriter writer = null;
+		
+		try {
+			writer = new BufferedWriter(new FileWriter(logPath, true));
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+			writer.write(System.lineSeparator() + dtf.format(now) + System.lineSeparator());
+			writer.write("Git Commit Revision Num: " + GitV.gitRevNum + System.lineSeparator());
+			writer.write("Git Commit Msg: " + GitV.gitMsg + System.lineSeparator());
+			
+			
+			
+			
+			writer.close();
+			return true;
+		}
+		catch (FileNotFoundException e) {
+			/** deal with exception appropriately **/
+			IJ.log("FileNotFoundException in Experiment.exportDataLog");
+			return false;
+		}
+		catch (IOException e) {
+			/** deal with exception appropriately **/
+			IJ.log("IOException in Experiment.exportDataLog");
 			return false;
 		}
 	}
