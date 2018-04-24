@@ -268,6 +268,9 @@ public class Cell {
 		
 		double volume2 = data.get("Area").get() * temp2[2];
 		data.put("Volume 0", new MutableDouble(volume2));
+		
+		
+		
 	}
 	
 	
