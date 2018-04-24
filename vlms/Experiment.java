@@ -277,10 +277,10 @@ public class Experiment {
 			
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 			LocalDateTime now = LocalDateTime.now();
-			writer.write(System.lineSeparator() + dtf.format(now) + System.lineSeparator());
+			writer.write(dtf.format(now) + System.lineSeparator());
 			writer.write("Git Commit Revision Num: " + GitV.gitRevNum + System.lineSeparator());
 			writer.write("Git Commit Msg: " + GitV.gitMsg + System.lineSeparator());
-			
+			writer.newLine();	
 			
 			
 			
