@@ -85,6 +85,7 @@ public class Hemisegment {
 			}
 			else if (allFiles[i].getName().equals(buildFileName(NUC_BIN_SUF))) {
 				nucBin = IJ.openImage(allFiles[i].getPath());
+				//IJ.log("got nucBin");
 			}
 			else if (allFiles[i].getName().equals(buildFileName(VL3_CSV_SUF))) {
 				vl3Csv = allFiles[i];

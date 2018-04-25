@@ -5,7 +5,7 @@ javac -cp "%FijiPath%\jars\*;%FijiPath%\plugins\*;." .\vlms\utilities\*.java
 if errorlevel 1 exit /b
 
 echo starting vlms
-javac -cp "%FijiPath%\jars\*;%FijiPath%\plugins\*;." .\vlms\*.java
+javac -cp "%FijiPath%\jars\*;%FijiPath%\plugins\*;.;.\vlms\utilities\." .\vlms\*.java
 if errorlevel 1 exit /b
 
 echo starting Dmel_Vls

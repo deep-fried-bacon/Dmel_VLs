@@ -43,6 +43,8 @@ public class Cell {
 	
 	int zLength;		// slices
 	
+	public static ArrayList<methodCalcDoc> methodDocs = new ArrayList<methodCalcDoc>();
+	
 	
 	public Cell(Hemisegment hemiseg, File roiPath, int vlNum, Calibration cal) {
 		this.hemiseg = hemiseg;
@@ -204,6 +206,31 @@ public class Cell {
 	}
 	
 	
+	//String methodName = myFunc();
+	boolean thicknessDocTemp = thicknessDoc(methodDocs);
+	public static boolean thicknessDoc(ArrayList<methodCalcDoc> methodDocs) {
+		String methodName = "Cell.thickness()";
+		
+		String methodDescrip = ("Takes cellOrthStack\n"
+			+ "for each slice\n"
+			+ "\tfor each column\n"
+			+ "\t\tcounts pixels greater than 15 (15 - random choice) - the  \"thickness\" at that point, records if some \"on\" pixels are separated by a gap of \"off\" pixels (basically never) only counts the first set (from top of imp), gets the average and mutliplies by area\n"
+			+ "thickness 0 - excludes cols that are 0 - assumed to be artificat of rectangle image of polygon roi, has the possibility of not measuring cols of 0 within cell roi - not sure if that matters\n"
+			+ "thickness 1 includes those columns\n"
+			+ "(volume 0) = (thickness 0) * (area of polygon roi)\n"
+			+ "(volume 1) = (thickness 1) * (area of rectangle imp/roi)\n");
+			//String heading = "volume 1";
+			String[] headings = {"thickness min 1", "thickness max 1", "thickness mean 1", "thickness min 0", "thickness max 0", "thickness mean 0", "thickness gap count", "Volume 1", "Volume 0"};
+		//public static 
+		//hemiseg.exper.cellMethodLogLookup.put("Volume 1", new methodCalcDoc(methodName, methodDescrip, headings));	
+		methodDocs.add(new methodCalcDoc(methodName, methodDescrip, headings));
+		//methodDocs.get(1).tears();
+		for (String h : headings) {
+			Experiment.heading2method.get("cell").put(h, methodName);
+		}
+		return true;
+	}
+	
 	public void thickness() {
 		ArrayList<Double> allCounts = new ArrayList<Double>();
 		ArrayList<Double> allCounts2 = new ArrayList<Double>();
@@ -262,20 +289,24 @@ public class Cell {
 		data.put("Volume 0", new MutableDouble(volume2));
 		
 		
-		String methodName = "Cell.thickness()";
-		String methodDescrip = ("Takes cellOrthStack\n"
-								 + "for each slice\n"
-								 + "\tfor each column\n"
-								 + "\t\tcounts pixels greater than 15 (15 - random choice) - the  \"thickness\" at that point, records if some \"on\" pixels are separated by a gap of \"off\" pixels (basically never) only counts the first set (from top of imp), gets the average and mutliplies by area\n"
-								 + "thickness 0 - excludes cols that are 0 - assumed to be artificat of rectangle image of polygon roi, has the possibility of not measuring cols of 0 within cell roi - not sure if that matters\n"
-								 + "thickness 1 includes those columns\n"
-								 + "(volume 0) = (thickness 0) * (area of polygon roi)\n"
-								 + "(volume 1) = (thickness 1) * (area of rectangle imp/roi)\n");
-		//String heading = "volume 1";
-		String[] headings = {"thickness min 1", "thickness max 1", "thickness mean 1", "thickness min 0", "thickness max 0", "thickness mean 0", "thickness gap count", "Volume 1", "Volume 0"};
-		hemiseg.exper.cellMethodLogLookup.put("Volume 1", new methodCalcDoc(methodName, methodDescrip, headings));		
+		
 	}
 	
+	/* <methodDoc> */
+	boolean volume2DocTemp = volume2Doc(methodDocs);
+	public static boolean volume2Doc(ArrayList<methodCalcDoc> methodDocs) {
+		String methodName = "Cell.volume2()";
+		String methodDescrip = ("Use cellHyp, set min to 15, sumSlices"
+			+ "need to double check whether set min is doing what we want it to do - set >15 to 0 not to 15");
+		String[] headings = {"Volume 2"};
+		methodDocs.add(new methodCalcDoc(methodName, methodDescrip, headings));
+		
+		for (String h : headings) {
+			Experiment.heading2method.get("cell").put(h, methodName);
+		}
+		return true;
+	}
+		/* </methodDoc>*/
 	
 	public void volume2() {
 		int c = hemiseg.exper.channels.get("Cell");
@@ -288,15 +319,14 @@ public class Cell {
 		
 		double sum = Functions.sumSlices(temp, hemiseg.cal.pixelDepth);
 		data.put("Volume 2", new MutableDouble(sum));
-		
+		/* 
 		String methodName = "Cell.volume2()";
 		String methodDescrip = ("Use cellHyp, set min to 15, sumSlices"
 								 + "need to double check whether set min is doing what we want it to do - set >15 to 0 not to 15");
 		String[] headings = {"Volume 2"};
 		hemiseg.exper.cellMethodLogLookup.put("Volume 2", new methodCalcDoc(methodName, methodDescrip, headings));		
-
-		
-	}
+	 */
+	 }
 	
 	public double[] arrayStats(ArrayList<Double> inArr) {
 		double min = inArr.get(0).intValue();

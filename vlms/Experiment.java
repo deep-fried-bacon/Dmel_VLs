@@ -34,15 +34,32 @@ public class Experiment {
 	public ArrayList<Cell> cells;
 	public ArrayList<Nucleus> nucs;
 	
-	public Hashtable<String, methodCalcDoc> cellMethodLogLookup  = new Hashtable<String, methodCalcDoc>();
-	public Hashtable<String, methodCalcDoc> nucMethodLogLookup  = new Hashtable<String, methodCalcDoc>();
+	//public static Hashtable<String, String[]> cellheading2method  = new Hashtable<String, String[]>();
+	//public static Hashtable<String, String[]> nucheading2method  = new Hashtable<String, String[]>();
 	
+	public static Hashtable<String, Hashtable<String, String>> heading2method  = initHeading2method();
+	
+	public static Hashtable<String, Hashtable<String, String>> initHeading2method() {
+		Hashtable<String, Hashtable<String, String>> temp = new Hashtable<String, Hashtable<String, String>>();
+		temp.put("nuc", new Hashtable<String, String>());
+		temp.put("cell", new Hashtable<String, String>());
+		return temp;
+	}
 	
 	
 	public static Experiment experConstructEverything(File path, String outFileSuf, String[] headings) {
 		Experiment exper = new Experiment(path);
 		exper.runEverything();
 		exper.exportNucData(outFileSuf, headings);
+		return exper;
+	}
+	
+	
+	public static Experiment experConstructEverything(File path, String nucFileSuf, String[] nucHeadings, String cellFileSuf, String[] cellHeadings) {
+		Experiment exper = new Experiment(path);
+		exper.runEverything();
+		exper.exportNucData(nucFileSuf, nucHeadings);
+		exper.exportCellData(cellFileSuf, cellHeadings);
 		return exper;
 	}
 	
@@ -66,7 +83,7 @@ public class Experiment {
 		this(new File(stringPath));
 	}
 	
-
+	//public static String myDumbTestVar = "butts";
 	
 	public void createIterables() {
 		cells = new ArrayList<Cell>();
@@ -168,13 +185,8 @@ public class Experiment {
 	
 	
 	
-	
-	
-	
-	
-	
 	public boolean exportCellData(String fileSuf, String[] headings) {
-		if (makeLogs) exportDataLog(fileSuf, "Cell");
+		if (makeLogs) exportDataLog(fileSuf, "cell", headings);
 
 		File outCsv = new File(path, name + "_" + fileSuf + ".csv");
 		BufferedWriter writer = null;
@@ -221,7 +233,7 @@ public class Experiment {
 	}
 		
 	public boolean exportNucData(String fileSuf, String[] headings) {
-		if (makeLogs) exportDataLog(fileSuf, "Nuc");
+		if (makeLogs) exportDataLog(fileSuf, "nuc", headings);
 		
 		File outCsv = new File(path, name + "_" + fileSuf + ".csv");
 		BufferedWriter writer = null;
@@ -268,9 +280,14 @@ public class Experiment {
 		}
 	}
 	
-	public boolean exportDataLog(String fileSuf, String nucOrCell) {
+	// nucOrCell = "nuc" or "cell" - add exception
+	public boolean exportDataLog(String fileSuf, String nucOrCell, String[] headings) {
+		exportMethodDoc();
+		
 		File logPath = new File(path, name + "_" + fileSuf + ".log");
 		BufferedWriter writer = null;
+		
+		Hashtable<String, ArrayList<String>> methodHeadingDict = new Hashtable<String, ArrayList<String>>();
 		
 		try {
 			writer = new BufferedWriter(new FileWriter(logPath, true));
@@ -280,6 +297,31 @@ public class Experiment {
 			writer.write(dtf.format(now) + System.lineSeparator());
 			writer.write("Git Commit Revision Num: " + GitV.gitRevNum + System.lineSeparator());
 			writer.write("Git Commit Msg: " + GitV.gitMsg + System.lineSeparator());
+			
+			
+			Hashtable<String, String> h2m = Experiment.heading2method.get(nucOrCell);
+			for (String h : headings) {
+				if (h2m.containsKey(h)) {
+					if (methodHeadingDict.containsKey(h2m.get(h))) {
+						methodHeadingDict.get(h2m.get(h)).add(h);
+					}
+					else {
+						//String[] temp = {h};
+						methodHeadingDict.put(h2m.get(h), new ArrayList<String>());
+						methodHeadingDict.get(h2m.get(h)).add(h);
+					}
+				}
+			}
+			
+			//IJ.log(String.valueOf(methodHeadingDict.size()));
+			if (methodHeadingDict.size() > 0) {
+				writer.write("Col Headings - Java Methods:" + System.lineSeparator());
+				for (String m : methodHeadingDict.keySet()) {
+					writer.write("\t" + String.join(", ", methodHeadingDict.get(m)));
+					writer.write(" - " + m + System.lineSeparator());
+				}
+			}
+				
 			writer.newLine();	
 			
 			
@@ -298,6 +340,63 @@ public class Experiment {
 			return false;
 		}
 	}
+	
+	public boolean exportMethodDoc() {
+		
+		File methodDocPath = new File(path, name + "_" + "method-doc" + ".log");
+		BufferedWriter writer = null;
+		
+		//Hashtable<String, ArrayList<String>> methodHeadingDict = new Hashtable<String, ArrayList<String>>();
+		
+		try {
+			writer = new BufferedWriter(new FileWriter(methodDocPath, true));
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+			writer.write(dtf.format(now) + System.lineSeparator());
+			writer.write("Git Commit Revision Num: " + GitV.gitRevNum + System.lineSeparator());
+			writer.write("Git Commit Msg: " + GitV.gitMsg + System.lineSeparator());
+			
+			writer.write("Cell:\n");
+			
+			
+			// for (int i = 0; i < Cell.methodDocs.size(); i++) {
+				// methodCalcDoc poo = Cell.methodDocs.get(i);
+				// poo.tears();
+			// }
+			
+			for (methodCalcDoc mcd : Cell.methodDocs) {
+				
+				writer.write(mcd.butts("\t"));
+				writer.newLine();	
+
+			}
+			for (methodCalcDoc mcd : Nucleus.methodDocs) {
+				//String temp = "\t";
+
+				writer.write(mcd.butts("\t"));
+				writer.newLine();	
+
+			}
+		
+			
+			
+			
+			writer.close();
+			return true;
+		}
+		catch (FileNotFoundException e) {
+			/** deal with exception appropriately **/
+			IJ.log("FileNotFoundException in Experiment.exportDataLog");
+			return false;
+		}
+		catch (IOException e) {
+			/** deal with exception appropriately **/
+			IJ.log("IOException in Experiment.exportDataLog");
+			return false;
+		}
+	}
+	
 	
 	public static String headingRename(String heading) {
 		Hashtable<String,String> headingDict = new Hashtable<String,String>();
