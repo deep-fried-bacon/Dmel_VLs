@@ -123,7 +123,7 @@ public class Nucleus {
 	}
 
 	
-	public void countOrthPixels () {
+	public void countOrthPixels() {
 		if (orthStack == null) {
 			/* exception */
 			IJ.log(fullId());
@@ -161,9 +161,15 @@ public class Nucleus {
 		
 		data.put("vol pix count", new MutableDouble((double)pixelCount));
 		data.put("vol pix sum", new MutableDouble((double)pixelSum));
+		
+		String methodName = "Nucleus.countOrthPixels()";
+		String methodDescrip = ("use croppedOrthStack"
+								 + "for each slice count every \"on\" pixel (>0) and sum pixel value of every \"on\" pixel (should be the same as sum all with 0 cutoff)");
+		String[] headings = {"vol pix count", "vol pix sum"};
+		cell.hemiseg.exper.nucMethodLogLookup.put("vol pix count", new methodCalcDoc(methodName, methodDescrip, headings));		
 	}
 
-	public void yScaled () {
+	public void yScaled() {
 		double inY = data.get("Y").get();
 		double inY2 = cell.hemiseg.cal.getRawY(inY);
 		MutableDouble outY = cell.yScaled(inY2);
@@ -191,11 +197,19 @@ public class Nucleus {
 		}
 		
 		ImagePlus orthStackCrop = Functions.cropStack(orthStack, orthRoi);
+		// update to use get/set methods?
 		
 		double sum = Functions.sumSlices(orthStackCrop, xCal);
 		if (sum == -1) return;
 
 		data.put("orth vol sum", new MutableDouble(sum));
+		
+		String methodName = "Nucleus.sumSlicesOrthStack()";
+		String methodDescrip = ("uses orthStackCrop (croppedOrthStack?)"
+								 + "is (of course) cropped to orthRoi"
+								 + "FunctionsSumSlices");
+		String[] headings = {"orth vol sum"};
+		cell.hemiseg.exper.nucMethodLogLookup.put("orth vol sum", new methodCalcDoc(methodName, methodDescrip, headings));		
 	}
 	
 	public void sumSlicesStack() {
@@ -203,6 +217,13 @@ public class Nucleus {
 		if (sum == -1) return;
 		
 		data.put("stack vol sum", new MutableDouble(sum));
+		
+		String methodName = "Nucleus.sumSlicesStack()";
+		String methodDescrip = ("sum slices of nuc stack"
+								 + "should be close to sumSliceOrthStack()");
+								 
+		String[] headings = {"stack vol sum"};
+		cell.hemiseg.exper.nucMethodLogLookup.put("stack vol sum", new methodCalcDoc(methodName, methodDescrip, headings));
 	}
 	
 	public void sumSlicesSubStack() {
@@ -236,6 +257,14 @@ public class Nucleus {
 		if (sum2 != -1) {
 			data.put("cropped stack vol sum2", new MutableDouble(sum2));
 		}
+		
+		String methodName = "Nucleus.sumSlicesOrthStack()";
+		String methodDescrip = ("sum slices of croppedStack -"
+								 + "stack vertically cropped using orthRoi to set top + bot slices"
+								 + "sum1 - top + bot same as orthRoi"
+								 + "sum2 - top + bot orthRoi +/- 3 (3 - different values tetsed, no buffer from orthRoi --> graph shows funny striping, uncropped --> outliers from VO nuclei, +/- 2 removed sum stripping, +/- 3 removed most striping)");
+		String[] headings = {"cropped stack vol sum","cropped stack vol sum2"};
+		cell.hemiseg.exper.nucMethodLogLookup.put("cropped stack vol sum", new methodCalcDoc(methodName, methodDescrip, headings));
 	}
 	
 
@@ -301,7 +330,7 @@ public class Nucleus {
 	public ImagePlus getOrth() {
 		return orth;
 	}
-	public boolean setOrth(ImagePlus orth) {
+	public boolean setOrth(ImagePlus orth) { 
 		if (orth == null) return false;
 		if (!(orth.getHeight() == chunkZ)) return false;
 		else {
