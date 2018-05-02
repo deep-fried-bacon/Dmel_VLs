@@ -13,6 +13,8 @@ import vlms.utilities.*;
 
 
 public class Hemisegment { 
+	public static boolean loggedOnce = false;
+
 	public static int GEO = 159457; 		/** without display label 158433 **/
 	public static int INTENS = 1934366 ; 	/** without display label 1933342 **/
 	
@@ -33,11 +35,13 @@ public class Hemisegment {
 	public String[] geoHeadings;
 	
 
-	public ImagePlus hyp = null;
+	public ImagePlus xy = null;
+	public ImagePlus yz = null;
+	//public ImagePlus hyp = null;
 	public Calibration cal = null;
-	public int sliceCount = -1;
+	//public int sliceCount = -1;
 
-	public ImagePlus nucBin = null;
+	//public ImagePlus nucBin = null;
 	
 	public File vl3Csv = null;
 	public File vl4Csv = null;
@@ -47,7 +51,10 @@ public class Hemisegment {
 	
 	public ArrayList<Cell> cells = new ArrayList<Cell>(); // for the purpose of iterating, especially in the context of not knowing if both cells are there
 	
-	
+	public void close() {
+		hyp.close();
+		nucBin.close();
+	}
 	public Hemisegment(Experiment exper, File hsPath) {
 		this.exper = exper;
 		this.path = hsPath;
@@ -57,6 +64,8 @@ public class Hemisegment {
 		loadFiles();	// sets fileList, (if files are there) hyp -->(cal, sliceCount), 
 						// nucBin, vl3Csv-->(vl3), vl4Csv-->(vl4)
 		loadNucs();
+		
+		Hemisegment.loggedOnce = true;
 	}
 	
 	public Hemisegment (Experiment exper, File hsPath, int a) {
@@ -127,13 +136,36 @@ public class Hemisegment {
 			int nucRoiY = (int)nucRoi.getContourCentroid()[1];
 			
 			for (Cell c : cells) {
-				if (c.roi.contains(nucRoiX,nucRoiY)) {
+				if (c.roiForH.contains(nucRoiX,nucRoiY)) {
 					c.nucs.add(new Nucleus(c, c.nucCount, nucRoi, nucRow));
 					c.nucCount++;
-					continue;
+				
+					// if (!loggedOnce) {
+
+						// //IJ.log(String.valueOf(c.roi.getContourCentroid()[0]) + ", " + String.valueOf(c.roi.getContourCentroid()[1]));
+						
+						// //IJ.log(c.toString() + ": " + nucRoiX + ", " + nucRoiY); 
+					// }
+					// continue;
+
 				}
-			}	
+			}
+
+		
 		}	
+		
+		// if (!loggedOnce) {
+			// for (Cell c : cells) {
+				// IJ.log(c.toString());
+				// IJ.log(c.roi.getPolygon().xpoints.toString());
+				// IJ.log(c.roi.getPolygon().xpoints.toString());
+				
+				// for (Nucleus n : c.nucs) {
+					// //IJ.log(n.toString());
+					// //IJ.log(String.valueOf(n.data.get("Area").get()));
+				// }
+			// }
+		// }
 	}
 
 	public String buildFileName(String suffix) {

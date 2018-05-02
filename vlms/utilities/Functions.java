@@ -323,7 +323,7 @@ public class Functions {
 		for (int i = 0; i < percCol.length; i++) {
 			sum += (totArea * percCol[i] * scale)/100;
 		}
-				rt.show("butts");
+				//rt.show("butts");
 
 		return sum;
 	}

@@ -22,7 +22,8 @@ public class Cell {
 	public int vlNum = -1;
 	
 	public File roiPath;
-	public Roi roi;
+	public Roi roiForH;
+	public Roi roiForC;
 	
 	public ArrayList<Double> roiX = new ArrayList<Double>(0);
 	public ArrayList<Double> roiY = new ArrayList<Double>(0);
@@ -45,15 +46,28 @@ public class Cell {
 	
 	public static ArrayList<methodCalcDoc> methodDocs = new ArrayList<methodCalcDoc>();
 	
+	public void close() {
+		roiForH = null;
+		roiForC = null;
+		try {
+			cellHyp.close();
+			cellOrthStack.close();
+			cellOrth.close();
+		}
+		catch (Exception e) {}
+	}
 	
 	public Cell(Hemisegment hemiseg, File roiPath, int vlNum, Calibration cal) {
 		this.hemiseg = hemiseg;
 		this.vlNum = vlNum;
 		
-		this.roiPath = roiPath;
+		this.roiPath 	= roiPath;
 		//IJ.log("before openRoiCsv");
-		roi = openRoiCsv(roiPath, cal);
-		//IJ.log("roi = " + roi);
+		this.roiForH = openRoiCsv(roiPath, cal);
+		
+		this.roiForC = new PolygonRoi(roiForH.getFloatPolygon(),2);
+		roiForC.setLocation(0,0);
+		//IJ.log("roiForH = " + roiForH);
 		makeCellHyp();
 			
 		makeGeoData();
@@ -117,7 +131,7 @@ public class Cell {
 	}
 	
 	public void makeGeoData() {
-		cellHyp.setRoi(roi);
+		cellHyp.setRoi(roiForC);
 		cellHyp.setC(hemiseg.exper.channels.get("Cell"));
 		ResultsTable rt = new ResultsTable();
 		Analyzer a = new Analyzer(cellHyp, Hemisegment.GEO, rt);
@@ -168,12 +182,11 @@ public class Cell {
 	}	
 		
 	public void makeCellHyp() {
-		cellHyp = Functions.cropStack(hemiseg.hyp, roi);
+		cellHyp = Functions.cropStack(hemiseg.hyp, roiForH);
 		
-		PolygonRoi tempRoi = new PolygonRoi(roi.getFloatPolygon(),2);
-		cellHyp.setRoi(tempRoi);
-		tempRoi.setLocation(0,0);
-		roi = tempRoi;
+		
+		//roi = tempRoi;
+		cellHyp.setRoi(roiForC);
 		
 		ImagePlus temp = WindowManager.getTempCurrentImage();
 		WindowManager.setTempCurrentImage(cellHyp);
@@ -271,7 +284,14 @@ public class Cell {
 		
 		double[] temp = arrayStats(allCounts);
 		double[] temp2 = arrayStats(allCounts2);
-
+		
+		// for (double d : temp) {
+			// IJ.log(String.valueOf(d));
+		// }
+		// for (double d : temp2) {
+			// IJ.log(String.valueOf(d));
+		// }
+		
 		
 		data.put("thickness min 1", new MutableDouble(temp[0]));
 		data.put("thickness max 1", new MutableDouble(temp[1]));
@@ -306,11 +326,11 @@ public class Cell {
 		}
 		return true;
 	}
-		/* </methodDoc>*/
+	/* </methodDoc>*/
 	
 	public void volume2() {
 		int c = hemiseg.exper.channels.get("Cell");
-		cellHyp.setRoi(roi);
+		cellHyp.setRoi(roiForC);
 		Duplicator d = new Duplicator();
 		ImagePlus temp = d.run(cellHyp,c,c,1,cellHyp.getNSlices(),1,1);
 
@@ -360,7 +380,7 @@ public class Cell {
 	}
 	
 	public MutableDouble yScaled(MutableDouble num) {
-		Rectangle bounds = roi.getBounds();
+		Rectangle bounds = roiForH.getBounds();
 		double height = bounds.height;
 		double start = bounds.y;
 		
@@ -373,7 +393,7 @@ public class Cell {
 	}
 	
 	public MutableDouble yScaled(double yPoint) {
-		Rectangle bounds = roi.getBounds();
+		Rectangle bounds = roiForH.getBounds();
 		double height = bounds.height;
 		double start = bounds.y;
 		
@@ -415,8 +435,10 @@ public class Cell {
 		
 		if (roiPath == null) doesntHave += "roiPath, ";
 		else has += "roiPath, ";
-		if (roi == null) doesntHave += "roi, ";
-		else has += "roi, ";
+		if (roiForH == null) doesntHave += "roiForH, ";
+		else has += "roiForH, ";
+		if (roiForC == null) doesntHave += "roiForC, ";
+		else has += "roiForC, ";
 		
 		if (roiX == null) doesntHave += "roiX, ";
 		else has += "roiX, ";
@@ -443,7 +465,8 @@ public class Cell {
 		temp += ("\nvlNum: " + vlNum);
 		
 		temp += ("\nroiPath: " + roiPath);
-		temp += ("\nroi: " + roi);
+		temp += ("\nroi: " + roiForH);
+		temp += ("\nroi: " + roiForC);
 		
 		temp += ("\nroiX: " + roiX);
 		temp += ("\nroiY: " + roiY);

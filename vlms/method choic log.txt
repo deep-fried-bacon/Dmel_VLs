@@ -1,0 +1,46 @@
+Cell.thickness()
+	Takes cellOrthStack
+	for each slice
+		for each column
+			counts pixels greater than 15 (15 - random choice) - the  "thickness" at that point, records if some "on" pixels are separated by a gap of "off" pixels (basically never) only counts the first set (from top of imp), gets the average and mutliplies by area
+	thickness 0 - excludes cols that are 0 - assumed to be artificat of rectangle image of polygon roi, has the possibility of not measuring cols of 0 within cell roi - not sure if that matters
+	
+	thickness 1 includes those columns
+	(volume 0) = (thickness 0) * (area of polygon roi)
+	(volume 1) = (thickness 1) * (area of rectangle imp/roi)
+	
+	Notes:
+		cols that are 0 - all pixels less than 15 - excludes not just completely empty columns, likely to include columns within polygon roi
+		
+		might be good to compare results while varying 15pixval cutoff
+		
+		volume 1 (rectangle) - more accurate because includes all cols within the area used to calculate it's volume (rectangle roi)
+		
+		volume 0 (polygon) - might exclude empty cols("pseudo empty" because non 0 cutoff) within it's area (polygon roi) because "pseudo empty" cols within roi would still be excluded
+		
+		thickness 0 mean, dist, and other stats more representative of data because thickness 1 has artifact of rectangle imgage w/ polygon roi
+		
+Cell.volume2()
+	Note:
+		sets min to 15
+			IJ.setMinAndMax(temp, 15, 255);
+			IJ.run(temp, "Apply LUT", "stack");
+		
+		what does this do exactly?
+			anything under 15 --> 0? - code needs this
+			or under 15 --> 15?
+			
+			
+Nucleus.sumSlicesOrthStack()
+	Notes:
+		needs to be updated to use get/set methods for croppedOrthStack I think
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

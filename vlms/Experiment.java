@@ -59,6 +59,7 @@ public class Experiment {
 		Experiment exper = new Experiment(path);
 		exper.runEverything();
 		exper.exportNucData(nucFileSuf, nucHeadings);
+		exper.forEachCell();
 		exper.exportCellData(cellFileSuf, cellHeadings);
 		return exper;
 	}
@@ -69,9 +70,10 @@ public class Experiment {
 		insts.add(this);
 		this.path = path;
 		//experView = new ExperimentView(this);
-		
-		parseName(); // sets name, data, genotype
-
+		try {
+			parseName(); // sets name, data, genotype
+		}
+		catch (Exception e) {}
 		loadChannels(); // sets channels 
 
 		createHemisegs(); // sets hemisegs
@@ -103,12 +105,15 @@ public class Experiment {
 	public void close() {
 		insts.remove(insts.indexOf(this));
 		for (Nucleus nuc : nucs) {
+			nuc.close();
 			nuc = null;
 		}
-		for (Cell c : cells) {
+		for (Cell c : cells) {;
+			c.close();
 			c = null;
 		}
 		for (Hemisegment hemiseg : hemisegs) {
+			hemiseg.close();
 			hemiseg = null;
 		}
 	}
@@ -436,7 +441,7 @@ public class Experiment {
 		for (Cell c : cells) {
 			c.thickness();
 			c.volume2();
-			//c.makeTotalAV();	
+			c.makeTotalAV();	
 		}	
 	}
 		

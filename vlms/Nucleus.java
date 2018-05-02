@@ -41,6 +41,19 @@ public class Nucleus {
 	public double zCal = -1;
 
 	
+	public void close() {
+		try {	
+			stack.close();
+			orthStack.close();
+			orth.close();
+			orthThresh.close();
+			croppedOrthStack.close();
+		}
+		catch (Exception e) {}		
+		orthRoi = null;
+		roi = null;
+		
+	}
 	
 	public static ArrayList<methodCalcDoc> methodDocs = new ArrayList<methodCalcDoc>();
 	
